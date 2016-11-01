@@ -1,6 +1,37 @@
     version: '2'
     services:
-      ldap-master:
+      ldap-master-a:
         image: osixia/openldap:1.1.6
+        hostname: ldap.example.org
         environment:
-          LDAP_ADMIN_PASSWORD: test
+          LDAP_LOG_LEVEL: "256"
+          LDAP_ORGANISATION: "Example Inc."
+          LDAP_DOMAIN: "example.org"
+          LDAP_BASE_DN: ""
+          LDAP_ADMIN_PASSWORD: "test"
+          LDAP_CONFIG_PASSWORD: "config"
+          LDAP_REPLICATION: "true"
+          LDAP_REPLICATION_CONFIG_SYNCPROV: "binddn=\"cn=admin,cn=config\" bindmethod=simple credentials=$LDAP_CONFIG_PASSWORD searchbase=\"cn=config\" type=refreshAndPersist retry=\"60 +\" timeout=1 starttls=critical"
+          LDAP_REPLICATION_DB_SYNCPROV: "binddn=\"cn=admin,$LDAP_BASE_DN\" bindmethod=simple credentials=$LDAP_ADMIN_PASSWORD searchbase=\"$LDAP_BASE_DN\" type=refreshAndPersist interval=00:00:00:10 retry=\"60 +\" timeout=1 starttls=critical"
+          LDAP_REPLICATION_HOSTS: "PYTHON2BASH:['ldap://ldap.example.org','ldap://ldap2.example.org']"
+        networks:
+          - ldap-network
+      ldap-master-b:
+        image: osixia/openldap:1.1.6
+        hostname: ldap2.example.org
+        environment:
+          LDAP_LOG_LEVEL: "256"
+          LDAP_ORGANISATION: "Example Inc."
+          LDAP_DOMAIN: "example.org"
+          LDAP_BASE_DN: ""
+          LDAP_ADMIN_PASSWORD: "test"
+          LDAP_CONFIG_PASSWORD: "config"
+          LDAP_REPLICATION: "true"
+          LDAP_REPLICATION_CONFIG_SYNCPROV: "binddn=\"cn=admin,cn=config\" bindmethod=simple credentials=$LDAP_CONFIG_PASSWORD searchbase=\"cn=config\" type=refreshAndPersist retry=\"60 +\" timeout=1 starttls=critical"
+          LDAP_REPLICATION_DB_SYNCPROV: "binddn=\"cn=admin,$LDAP_BASE_DN\" bindmethod=simple credentials=$LDAP_ADMIN_PASSWORD searchbase=\"$LDAP_BASE_DN\" type=refreshAndPersist interval=00:00:00:10 retry=\"60 +\" timeout=1 starttls=critical"
+          LDAP_REPLICATION_HOSTS: "PYTHON2BASH:['ldap://ldap.example.org','ldap://ldap2.example.org']"
+        networks:
+            - ldap-network
+    networks:
+      ldap-network:
+        driver: bridge
