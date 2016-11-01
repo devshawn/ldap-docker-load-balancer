@@ -1,0 +1,6 @@
+    version: '2'
+    services:
+      ldap-master:
+        image: osixia/openldap:1.1.6
+        environment:
+          LDAP_ADMIN_PASSWORD: test
