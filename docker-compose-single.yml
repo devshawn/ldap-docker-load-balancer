@@ -1,0 +1,10 @@
+version: "2"
+services:
+  ldap:
+    environment:
+      LDAP_ORGANISATION: "Double of Science"
+      LDAP_DOMAIN: "clontarf.umm"
+      LDAP_ADMIN_PASSWORD: "admin"
+    image: osixia/openldap
+    ports:
+      - "3889:389"

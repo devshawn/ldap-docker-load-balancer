@@ -1,0 +1,33 @@
+version: "2"
+services:
+  ldap-a:
+    environment:
+      LDAP_ORGANISATION: "Double of Science"
+      LDAP_DOMAIN: "clontarf.umm"
+      LDAP_ADMIN_PASSWORD: "admin"
+      LDAP_REPLICATION: "true"
+      LDAP_REPLICATION_HOSTS: "PYTHON2BASH:['ldap://ldap-a.clontarf.umm','ldap://ldap-b.clontarf.umm']"
+      TCP_PORTS: 389
+    hostname: ldap-a.clontarf.umm
+    image: osixia/openldap
+  ldap-b:
+    environment:
+      LDAP_ORGANISATION: "Double of Science"
+      LDAP_DOMAIN: "clontarf.umm"
+      LDAP_ADMIN_PASSWORD: "admin"
+      LDAP_REPLICATION: "true"
+      LDAP_REPLICATION_HOSTS: "PYTHON2BASH:['ldap://ldap-a.clontarf.umm','ldap://ldap-b.clontarf.umm']"
+      TCP_PORTS: 389
+    hostname: ldap-b.clontarf.umm
+    image: osixia/openldap
+  load-balancer:
+    environment:
+      MODE: "tcp"
+    image: dockercloud/haproxy
+    links:
+      - ldap-a
+      - ldap-b
+    ports:
+      - "3889:389"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
