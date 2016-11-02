@@ -1,19 +1,32 @@
 version: "2"
 services:
-  ldap-a:
+  ldap_a:
     environment:
       LDAP_ADMIN_PASSWORD: "admin"
       LDAP_DOMAIN: "clontarf.umm"
       LDAP_ORGANISATION: "Double of Science"
       TCP_PORTS: 389
+    hostname: ldap-a
     image: osixia/openldap
-  load-balancer:
+    networks:
+      internal:
+        aliases:
+          - ldap-a
+  load_balancer:
     environment:
       MODE: "tcp"
     image: dockercloud/haproxy
     links:
-      - ldap-a
+      - ldap_a
+    networks:
+      - default
+      - internal
     ports:
       - "3889:389"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+networks:
+  default:
+    driver: bridge
+  internal:
+    driver: bridge
