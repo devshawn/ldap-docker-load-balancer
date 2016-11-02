@@ -6,18 +6,28 @@ services:
       LDAP_DOMAIN: "clontarf.umm"
       LDAP_ORGANISATION: "Double of Science"
       LDAP_REPLICATION: "true"
-      LDAP_REPLICATION_HOSTS: "PYTHON2BASH:['ldap://ldap_a','ldap://ldap_b']"
+      LDAP_REPLICATION_HOSTS: "#PYTHON2BASH:['ldap://ldap-a','ldap://ldap-b']"
       TCP_PORTS: 389
+    hostname: ldap-a
     image: osixia/openldap
+    networks:
+      internal:
+        aliases:
+          - ldap-a
   ldap_b:
     environment:
       LDAP_ADMIN_PASSWORD: "admin"
       LDAP_DOMAIN: "clontarf.umm"
       LDAP_ORGANISATION: "Double of Science"
       LDAP_REPLICATION: "true"
-      LDAP_REPLICATION_HOSTS: "PYTHON2BASH:['ldap://ldap_a','ldap://ldap_b']"
+      LDAP_REPLICATION_HOSTS: "#PYTHON2BASH:['ldap://ldap-a','ldap://ldap-b']"
       TCP_PORTS: 389
+    hostname: ldap-b
     image: osixia/openldap
+    networks:
+      internal:
+        aliases:
+          - ldap-b
   load_balancer:
     environment:
       MODE: "tcp"
@@ -25,7 +35,15 @@ services:
     links:
       - ldap_a
       - ldap_b
+    networks:
+      - default
+      - internal
     ports:
       - "3889:389"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+networks:
+  default:
+    driver: bridge
+  internal:
+    driver: bridge
